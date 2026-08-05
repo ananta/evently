@@ -14,4 +14,5 @@ func (app *application) routes() http.Handler{
   router.MethodNotAllowed = http.HandlerFunc(app.methodNotAllowedResponse)
 
 
+  return app.recoverPanic(app.logRequest(commonHeaders(router))) 
 }
