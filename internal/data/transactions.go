@@ -1,8 +1,9 @@
 package data
 
 import (
+	"context"
 	"database/sql"
-	"errors"
+	"time"
 
 	"github.com/shopspring/decimal"
 )
@@ -17,27 +18,24 @@ type Transaction struct {
 	AccountID       int64           `json:"account_id"`
 	OperationTypeID int64           `json:"operation_type_id"`
 	Amount          decimal.Decimal `json:"amount"`
-	EventDate       string          `json:"event_date"`
+	EventDate       time.Time       `json:"event_date"`
 }
 
 type TransactionModel struct {
 	DB *sql.DB
 }
 
-func (t TransactionModel) Insert(transaction *Transaction) error {
+func (t TransactionModel) Insert(ctx context.Context, transaction *Transaction) error {
 	query := `
   INSERT INTO transactions (account_id, operation_type_id, amount)
   VALUES ($1, $2, $3)
-  RETURNING transaction_id, account_id, operation_type_id, amount
+  RETURNING transaction_id, account_id, operation_type_id, amount, event_date
   `
-	err := t.DB.QueryRow(query, transaction.AccountID, transaction.OperationTypeID, transaction.Amount).Scan(&transaction.TransactionID, &transaction.AccountID, &transaction.OperationTypeID, &transaction.Amount)
-	if err != nil {
-		switch {
-		case errors.Is(err, sql.ErrNoRows):
-			return ErrRecordNotFound
-		default:
-			return err
-		}
-	}
-	return nil
+	return t.DB.QueryRowContext(ctx, query, transaction.AccountID, transaction.OperationTypeID, transaction.Amount).Scan(
+		&transaction.TransactionID,
+		&transaction.AccountID,
+		&transaction.OperationTypeID,
+		&transaction.Amount,
+		&transaction.EventDate,
+	)
 }

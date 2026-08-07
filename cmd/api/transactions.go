@@ -39,7 +39,7 @@ func (app *application) createTransaction(w http.ResponseWriter, r *http.Request
 
 	// The transactions.account_id foreign key would reject this anyway, but
 	// checking here turns a constraint violation into a useful message.
-	_, err = app.models.Accounts.Get(input.AccountID)
+	_, err = app.accounts.Get(r.Context(), input.AccountID)
 	if err != nil {
 		switch {
 		case errors.Is(err, data.ErrRecordNotFound):
@@ -57,7 +57,7 @@ func (app *application) createTransaction(w http.ResponseWriter, r *http.Request
 		Amount:          input.Amount,
 		OperationTypeID: input.OperationTypeID,
 	}
-	err = app.models.Transactions.Insert(transaction)
+	err = app.transactions.Insert(r.Context(), transaction)
 	if err != nil {
 		app.serverErrorResponse(w, r, err)
 		return
