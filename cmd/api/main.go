@@ -75,9 +75,6 @@ func main() {
 
   logger.Info("starting server", "port", srv.Addr)
 
-  // TODO: should this be a non-blocking?
-  app.seedOperationTypes()
-
   err = srv.ListenAndServe()
   logger.Error(err.Error())
   os.Exit(1)
