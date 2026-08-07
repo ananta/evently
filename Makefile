@@ -1,8 +1,19 @@
+.PHONY: up down logs run \
+	migrate-up migrate-down migrate-force migrate-version create-migration \
+	test check
+
 # ==========================
 # Configuration
 # ==========================
 DB_URL=postgres://evently_user:evently_password@db:5432/evently_db?sslmode=disable
+DB_DSN=postgres://evently_user:evently_password@localhost:5432/evently_db?sslmode=disable
 MIGRATIONS=./migrations
+
+# ==========================
+# Application
+# ==========================
+run:
+	go run ./cmd/api -db-dsn="$(DB_DSN)"
 
 # ==========================
 # Docker
@@ -52,3 +63,14 @@ create-migration:
 		-v $(PWD)/migrations:/migrations \
 		migrate/migrate \
 		create -ext sql -dir /migrations -seq $(name)
+
+# ==========================
+# Quality
+# ==========================
+test:
+	go test -race ./...
+
+check:
+	gofmt -l .
+	go vet ./...
+	go test -race ./...
