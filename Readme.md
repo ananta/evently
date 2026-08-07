@@ -3,8 +3,15 @@
 Test app for interview
 
 ### Dependencies
+## Testing
 
-- [julienschmidt/httprouter](https://github.com/julienschmidt/httprouter)
+```bash
+make test    # run the suite with the race detector
+make check   # gofmt, go vet and the tests — run this before pushing
+```
+
+The suite requires no database; everything currently under test is pure.
+
 ## Dependencies
 
 - [julienschmidt/httprouter](https://github.com/julienschmidt/httprouter) — HTTP routing
