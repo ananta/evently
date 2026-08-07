@@ -18,6 +18,7 @@ func (app *application) routes() http.Handler{
   // create an account
   router.HandlerFunc(http.MethodPost, "/accounts", app.createAccount)
   // create a transaction
+  router.HandlerFunc(http.MethodPost, "/transactions", app.createTransaction)
 
   return app.recoverPanic(app.logRequest(commonHeaders(router))) 
 }
