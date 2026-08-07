@@ -3,14 +3,21 @@ package data
 import (
 	"database/sql"
 	"errors"
+
+	"github.com/shopspring/decimal"
 )
 
+// Unmarshal JSON without the quotes as decimal package's default is quoted strings
+func init() {
+	decimal.MarshalJSONWithoutQuotes = true
+}
+
 type Transaction struct {
-	TransactionID   int64   `json:"transaction_id"`
-	AccountID       int64   `json:"account_id"`
-	OperationTypeID int64   `json:"operation_type_id"`
-	Amount          float32 `json:"amount"`
-	EventDate       string  `json:"event_date"`
+	TransactionID   int64           `json:"transaction_id"`
+	AccountID       int64           `json:"account_id"`
+	OperationTypeID int64           `json:"operation_type_id"`
+	Amount          decimal.Decimal `json:"amount"`
+	EventDate       string          `json:"event_date"`
 }
 
 type TransactionModel struct {
