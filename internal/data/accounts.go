@@ -3,6 +3,7 @@ package data
 import (
 	"database/sql"
 	"errors"
+	"strings"
 )
 
 type Account struct {
@@ -19,7 +20,16 @@ func (a AccountModel) Insert(account *Account) error {
   INSERT INTO accounts (document_number)
   VALUES ($1)
   RETURNING account_id, document_number`
-	return a.DB.QueryRow(query, account.DocumentNumber).Scan(&account.AccountID, &account.DocumentNumber)
+	err := a.DB.QueryRow(query, account.DocumentNumber).Scan(&account.AccountID, &account.DocumentNumber)
+	if err != nil {
+		// document_number is UNIQUE; report the clash as a domain error so the
+		// handler can return 422 rather than a generic 500.
+		if strings.Contains(err.Error(), "accounts_document_number_key") {
+			return ErrDuplicateDocument
+		}
+		return err
+	}
+	return nil
 }
 
 func (a AccountModel) Get(id int64) (*Account, error) {
