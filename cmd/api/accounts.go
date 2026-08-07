@@ -40,12 +40,24 @@ func (app *application) createAccount(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	if msg := validDocumentNumber(input.DocumentNumber); msg != "" {
+		app.failedValidationResponse(w, r, map[string]string{"document_number": msg})
+		return
+	}
+
 	account := &data.Account{
 		DocumentNumber: input.DocumentNumber,
 	}
 	err = app.models.Accounts.Insert(account)
 	if err != nil {
-		app.serverErrorResponse(w, r, err)
+		switch {
+		case errors.Is(err, data.ErrDuplicateDocument):
+			app.failedValidationResponse(w, r, map[string]string{
+				"document_number": "an account with this document number already exists",
+			})
+		default:
+			app.serverErrorResponse(w, r, err)
+		}
 		return
 	}
 
