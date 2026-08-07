@@ -6,25 +6,25 @@ import (
 )
 
 var (
-  ErrRecordNotFound = errors.New("record not found")
+	ErrRecordNotFound = errors.New("record not found")
 )
 
 type Models struct {
-  Accounts AccountModel
-  Transactions TransactionModel
-  OperationTypes OperationTypeModel
+	Accounts       AccountModel
+	Transactions   TransactionModel
+	OperationTypes OperationTypeModel
 }
 
 func NewModels(db *sql.DB) Models {
-  return Models {
-    Accounts: AccountModel{
-      DB: db,
-    },
-    Transactions: TransactionModel{
-      DB: db,
-    },
-    OperationTypes: OperationTypeModel{
-      DB: db,
-    },
-  }
+	return Models{
+		Accounts: AccountModel{
+			DB: db,
+		},
+		Transactions: TransactionModel{
+			DB: db,
+		},
+		OperationTypes: OperationTypeModel{
+			DB: db,
+		},
+	}
 }

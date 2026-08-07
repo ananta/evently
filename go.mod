@@ -3,6 +3,6 @@ module github.com/ananta/evently
 go 1.26.5
 
 require (
-	github.com/julienschmidt/httprouter v1.3.0 // indirect
-	github.com/lib/pq v1.12.3 // indirect
+	github.com/julienschmidt/httprouter v1.3.0
+	github.com/lib/pq v1.12.3
 )

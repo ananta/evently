@@ -5,42 +5,41 @@ import (
 	"net/http"
 )
 
-func commonHeaders(next http.Handler) http.Handler{
-  return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-    w.Header().Set("X-Content-Type-Options", "nosniff") // -- stop MIME sniffing
-    w.Header().Set("Content-Security-Policy", "default-src 'none'") // -- restrictive csp works well for json apis
-    w.Header().Set("X-Frame-Options", "DENY") // -- prevent clickjacking
-    w.Header().Set("Referrer-Policy", "no-referrer") // -- don't leak urls in referrer header
-    next.ServeHTTP(w,r)
-  })
+func commonHeaders(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("X-Content-Type-Options", "nosniff")             // -- stop MIME sniffing
+		w.Header().Set("Content-Security-Policy", "default-src 'none'") // -- restrictive csp works well for json apis
+		w.Header().Set("X-Frame-Options", "DENY")                       // -- prevent clickjacking
+		w.Header().Set("Referrer-Policy", "no-referrer")                // -- don't leak urls in referrer header
+		next.ServeHTTP(w, r)
+	})
 }
 
-
 func (app *application) logRequest(next http.Handler) http.Handler {
-  return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-    var (
-      ip = r.RemoteAddr
-      proto = r.Proto
-      method = r.Method
-      uri = r.URL.RequestURI()
-    )
-    app.logger.Info("received request", "ip", ip, "proto", proto, "method", method, "uri", uri)
-    next.ServeHTTP(w, r)
-  })
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		var (
+			ip     = r.RemoteAddr
+			proto  = r.Proto
+			method = r.Method
+			uri    = r.URL.RequestURI()
+		)
+		app.logger.Info("received request", "ip", ip, "proto", proto, "method", method, "uri", uri)
+		next.ServeHTTP(w, r)
+	})
 }
 
 func (app *application) recoverPanic(next http.Handler) http.Handler {
-  return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-    // upon error, defer this function to return proper error
-    defer func() {
-      pv := recover()
-      // panic happened
-      if pv != nil {
-        w.Header().Set("Connection", "close")
-        app.serverErrorResponse(w, r, fmt.Errorf("%v", pv))
-      }
-    }()
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		// upon error, defer this function to return proper error
+		defer func() {
+			pv := recover()
+			// panic happened
+			if pv != nil {
+				w.Header().Set("Connection", "close")
+				app.serverErrorResponse(w, r, fmt.Errorf("%v", pv))
+			}
+		}()
 
-    next.ServeHTTP(w, r)
-  })
+		next.ServeHTTP(w, r)
+	})
 }
