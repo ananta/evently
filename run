@@ -1,0 +1,5 @@
+#!/usr/bin/env sh
+# Builds the API, starts PostgreSQL, applies migrations and serves on :4000.
+set -e
+
+docker compose up --build "$@"
