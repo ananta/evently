@@ -5,7 +5,7 @@ import (
   "strconv"
 )
 
-type Amount int
+type Amount float32
 
 func (a Amount) MarshalJSON() ([]byte, error){
   jsonValue := fmt.Sprintf("$%d", a)
