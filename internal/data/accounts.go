@@ -1,6 +1,8 @@
 package data
 
-type Accounts struct {
-  Account_ID int `json:"acount_id"`
-  Document_Number int  `json:"document_number"`
+
+type Account struct {
+  Account_ID int64 `json:"acount_id"`
+  Document_Number string  `json:"document_number"`
 }
+
