@@ -8,8 +8,10 @@ import (
 	"net/http"
 	"strconv"
   "strings"
+  "github.com/ananta/evently/internal/data"
 
 	"github.com/julienschmidt/httprouter"
+
 )
 
 type envelope map[string]any
@@ -81,5 +83,34 @@ func (app *application) readJSON(w http.ResponseWriter, r *http.Request, dst any
     return errors.New("body must only contain a single JSON value")
   }
   return nil
+}
+
+
+func (app *application) seedOperationTypes(){
+  operation_types := []string{
+    "Normal Purchase",
+    "Purchase with installments",
+    "Withdrawal",
+    "Credit Voucher",
+  }
+
+  hasError := false
+  for _, operation := range operation_types {
+    operation_type := data.OperationType {
+      Description: operation,
+    }
+    // TOOD: handle error
+    err := app.models.OperationTypes.Insert(&operation_type)
+    if err != nil {
+      hasError = true
+    }
+
+  }
+  if hasError == true {
+    app.logger.Info("Failed Seeding data")
+    return
+  }
+  app.logger.Info("Success Seeding data")
+
 }
 
