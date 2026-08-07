@@ -1,6 +1,7 @@
 package main
 
 import (
+	"errors"
 	"net/http"
 
 	"github.com/ananta/evently/internal/data"
@@ -19,10 +20,37 @@ func (app *application) createTransaction(w http.ResponseWriter, r *http.Request
 		return
 	}
 
-	// TODO:
-	// validate if operation type exists
-	// validate if proper sign is used in operation type
-	// validate document number
+	v := make(map[string]string)
+
+	if input.AccountID < 1 {
+		v["account_id"] = "must be a positive integer"
+	}
+	if !data.IsOperationType(input.OperationTypeID) {
+		v["operation_type_id"] = "must be a known operation type"
+	}
+	if msg := validAmount(input.OperationTypeID, input.Amount); msg != "" {
+		v["amount"] = msg
+	}
+
+	if len(v) > 0 {
+		app.failedValidationResponse(w, r, v)
+		return
+	}
+
+	// The transactions.account_id foreign key would reject this anyway, but
+	// checking here turns a constraint violation into a useful message.
+	_, err = app.models.Accounts.Get(input.AccountID)
+	if err != nil {
+		switch {
+		case errors.Is(err, data.ErrRecordNotFound):
+			app.failedValidationResponse(w, r, map[string]string{
+				"account_id": "account does not exist",
+			})
+		default:
+			app.serverErrorResponse(w, r, err)
+		}
+		return
+	}
 
 	transaction := &data.Transaction{
 		AccountID:       input.AccountID,
