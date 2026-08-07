@@ -4,13 +4,14 @@ import (
 	"net/http"
 
 	"github.com/ananta/evently/internal/data"
+	"github.com/shopspring/decimal"
 )
 
 func (app *application) createTransaction(w http.ResponseWriter, r *http.Request) {
 	var input struct {
-		AccountID       int64   `json:"account_id"`
-		OperationTypeID int64   `json:"operation_type_id"`
-		Amount          float32 `json:"amount"`
+		AccountID       int64           `json:"account_id"`
+		OperationTypeID int64           `json:"operation_type_id"`
+		Amount          decimal.Decimal `json:"amount"`
 	}
 	err := app.readJSON(w, r, &input)
 	if err != nil {
