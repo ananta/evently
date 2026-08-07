@@ -3,11 +3,14 @@ package main
 import (
 	"context"
 	"database/sql"
+	"errors"
 	"flag"
 	"fmt"
 	"log/slog"
 	"net/http"
 	"os"
+	"os/signal"
+	"syscall"
 	"time"
 
 	"github.com/ananta/evently/internal/data"
@@ -85,11 +88,38 @@ func main() {
 		ErrorLog:     slog.NewLogLogger(logger.Handler(), slog.LevelError),
 	}
 
+	// On SIGINT or SIGTERM, stop accepting connections and let in-flight
+	// requests finish before returning from main.
+	shutdown := make(chan struct{})
+
+	go func() {
+		quit := make(chan os.Signal, 1)
+		signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
+		sig := <-quit
+
+		logger.Info("shutting down server", "signal", sig.String())
+
+		ctx, cancel := context.WithTimeout(context.Background(), 20*time.Second)
+		defer cancel()
+
+		if err := srv.Shutdown(ctx); err != nil {
+			logger.Error("graceful shutdown failed", "error", err)
+		}
+		close(shutdown)
+	}()
+
 	logger.Info("starting server", "port", srv.Addr)
 
+	// Shutdown makes ListenAndServe return ErrServerClosed immediately, so wait
+	// for the drain to finish rather than exiting out from under it.
 	err = srv.ListenAndServe()
-	logger.Error(err.Error())
-	os.Exit(1)
+	if !errors.Is(err, http.ErrServerClosed) {
+		logger.Error(err.Error())
+		os.Exit(1)
+	}
+
+	<-shutdown
+	logger.Info("server stopped")
 }
 
 func openDB(cfg config) (*sql.DB, error) {
