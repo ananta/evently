@@ -13,6 +13,7 @@ func (app *application) routes() http.Handler{
   router.NotFound = http.HandlerFunc(app.notFoundResponse)
   router.MethodNotAllowed = http.HandlerFunc(app.methodNotAllowedResponse)
 
+  router.HandlerFunc(http.MethodGet, "/v1/healthcheck", app.healthcheckHandler)
   // retrieve the account information
   router.HandlerFunc(http.MethodGet, "/accounts/:id", app.getAccount)
   // create an account
