@@ -13,7 +13,7 @@ func (app *application) getAccount(w http.ResponseWriter, r *http.Request) {
 		app.notFoundResponse(w, r)
 		return
 	}
-	account, err := app.models.Accounts.Get(int64(id))
+	account, err := app.accounts.Get(r.Context(), int64(id))
 	if err != nil {
 		switch {
 		case errors.Is(err, data.ErrRecordNotFound):
@@ -48,7 +48,7 @@ func (app *application) createAccount(w http.ResponseWriter, r *http.Request) {
 	account := &data.Account{
 		DocumentNumber: input.DocumentNumber,
 	}
-	err = app.models.Accounts.Insert(account)
+	err = app.accounts.Insert(r.Context(), account)
 	if err != nil {
 		switch {
 		case errors.Is(err, data.ErrDuplicateDocument):

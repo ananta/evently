@@ -28,10 +28,22 @@ type config struct {
 	}
 }
 
+// The handlers depend on these rather than on *sql.DB, so tests can supply
+// stubs. Defined here, in the package that consumes them.
+type accountStore interface {
+	Insert(ctx context.Context, account *data.Account) error
+	Get(ctx context.Context, id int64) (*data.Account, error)
+}
+
+type transactionStore interface {
+	Insert(ctx context.Context, transaction *data.Transaction) error
+}
+
 type application struct {
-	config config
-	logger *slog.Logger
-	models data.Models
+	config       config
+	logger       *slog.Logger
+	accounts     accountStore
+	transactions transactionStore
 }
 
 func main() {
@@ -58,9 +70,10 @@ func main() {
 	logger.Info("database connection pool established")
 
 	app := application{
-		config: cfg,
-		logger: logger,
-		models: data.NewModels(db),
+		config:       cfg,
+		logger:       logger,
+		accounts:     data.AccountModel{DB: db},
+		transactions: data.TransactionModel{DB: db},
 	}
 
 	srv := &http.Server{
