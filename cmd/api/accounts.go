@@ -23,7 +23,7 @@ func (app *application) getAccount(w http.ResponseWriter, r *http.Request) {
 		}
 		return
 	}
-	err = app.writeJSON(w, http.StatusOK, envelope{"account": account}, nil)
+	err = app.writeJSON(w, http.StatusOK, account, nil)
 	if err != nil {
 		app.serverErrorResponse(w, r, err)
 	}
@@ -49,7 +49,7 @@ func (app *application) createAccount(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = app.writeJSON(w, http.StatusCreated, envelope{"account": account}, nil)
+	err = app.writeJSON(w, http.StatusCreated, account, nil)
 	if err != nil {
 		app.serverErrorResponse(w, r, err)
 	}

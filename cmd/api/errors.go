@@ -16,9 +16,7 @@ func (app *application) logError(r *http.Request, err error) {
 
 // errorResponse(): A helper for sending JSON-formatted error
 func (app *application) errorResponse(w http.ResponseWriter, r *http.Request, status int, message any) {
-	env := envelope{"error": message}
-
-	err := app.writeJSON(w, status, env, nil)
+	err := app.writeJSON(w, status, map[string]any{"error": message}, nil)
 	if err != nil {
 		app.logError(r, err)
 		w.WriteHeader(http.StatusInternalServerError)

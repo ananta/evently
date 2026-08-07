@@ -34,9 +34,9 @@ func (app *application) createTransaction(w http.ResponseWriter, r *http.Request
 		app.serverErrorResponse(w, r, err)
 		return
 	}
-	err = app.writeJSON(w, http.StatusCreated, envelope{"transaction": transaction}, nil)
+
+	err = app.writeJSON(w, http.StatusCreated, transaction, nil)
 	if err != nil {
 		app.serverErrorResponse(w, r, err)
 	}
-
 }
