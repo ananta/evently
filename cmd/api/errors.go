@@ -41,7 +41,7 @@ func (app *application) notFoundResponse(w http.ResponseWriter, r *http.Request)
 // methodNotAllowedResponse(): A helper method to send a 405 method not allowed status code
 func (app *application) methodNotAllowedResponse(w http.ResponseWriter, r *http.Request) {
 	message := fmt.Sprintf("the %s method is not supported for this resource", r.Method)
-	app.errorResponse(w, r, http.StatusNotFound, message)
+	app.errorResponse(w, r, http.StatusMethodNotAllowed, message)
 }
 
 // badRequestResponse(): A helper method to send a bad request response
