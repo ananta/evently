@@ -8,9 +8,9 @@ import (
 
 func (app *application) createTransaction(w http.ResponseWriter, r *http.Request) {
 	var input struct {
-		Account_ID        int64   `json:"account_id"`
-		Operation_Type_ID int64   `json:"operation_type_id"`
-		Amount            float32 `json:"amount"`
+		AccountID       int64   `json:"account_id"`
+		OperationTypeID int64   `json:"operation_type_id"`
+		Amount          float32 `json:"amount"`
 	}
 	err := app.readJSON(w, r, &input)
 	if err != nil {
@@ -24,16 +24,16 @@ func (app *application) createTransaction(w http.ResponseWriter, r *http.Request
 	// validate document number
 
 	transaction := &data.Transaction{
-		Account_ID:       input.Account_ID,
-		Amount:           input.Amount,
-		OperationType_ID: input.Operation_Type_ID,
+		AccountID:       input.AccountID,
+		Amount:          input.Amount,
+		OperationTypeID: input.OperationTypeID,
 	}
 	err = app.models.Transactions.Insert(transaction)
 	if err != nil {
 		app.serverErrorResponse(w, r, err)
 		return
 	}
-	err = app.writeJson(w, http.StatusCreated, envelope{"transaction": transaction}, nil)
+	err = app.writeJSON(w, http.StatusCreated, envelope{"transaction": transaction}, nil)
 	if err != nil {
 		app.serverErrorResponse(w, r, err)
 	}

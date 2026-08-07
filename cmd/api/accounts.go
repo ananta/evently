@@ -11,6 +11,7 @@ func (app *application) getAccount(w http.ResponseWriter, r *http.Request) {
 	id, err := app.readIDParam(r)
 	if err != nil {
 		app.notFoundResponse(w, r)
+		return
 	}
 	account, err := app.models.Accounts.Get(int64(id))
 	if err != nil {
@@ -22,7 +23,7 @@ func (app *application) getAccount(w http.ResponseWriter, r *http.Request) {
 		}
 		return
 	}
-	err = app.writeJson(w, http.StatusOK, envelope{"account": account}, nil)
+	err = app.writeJSON(w, http.StatusOK, envelope{"account": account}, nil)
 	if err != nil {
 		app.serverErrorResponse(w, r, err)
 	}
@@ -30,7 +31,7 @@ func (app *application) getAccount(w http.ResponseWriter, r *http.Request) {
 
 func (app *application) createAccount(w http.ResponseWriter, r *http.Request) {
 	var input struct {
-		Document_Number string `json:"document_number"`
+		DocumentNumber string `json:"document_number"`
 	}
 
 	err := app.readJSON(w, r, &input)
@@ -40,7 +41,7 @@ func (app *application) createAccount(w http.ResponseWriter, r *http.Request) {
 	}
 
 	account := &data.Account{
-		Document_Number: input.Document_Number,
+		DocumentNumber: input.DocumentNumber,
 	}
 	err = app.models.Accounts.Insert(account)
 	if err != nil {
@@ -48,7 +49,7 @@ func (app *application) createAccount(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = app.writeJson(w, http.StatusCreated, envelope{"account": account}, nil)
+	err = app.writeJSON(w, http.StatusCreated, envelope{"account": account}, nil)
 	if err != nil {
 		app.serverErrorResponse(w, r, err)
 	}

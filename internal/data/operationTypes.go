@@ -3,8 +3,8 @@ package data
 import "database/sql"
 
 type OperationType struct {
-	OperationType_ID int    `json:"operation_type_id"`
-	Description      string `json:"description"`
+	OperationTypeID int    `json:"operation_type_id"`
+	Description     string `json:"description"`
 }
 
 type OperationTypeModel struct {
